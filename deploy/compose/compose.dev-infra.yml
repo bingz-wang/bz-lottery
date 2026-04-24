@@ -1,0 +1,146 @@
+name: lottery-platform-dev-infra
+
+services:
+  postgres:
+    image: postgres:${POSTGRES_IMAGE_TAG:-17-alpine}
+    container_name: lottery-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-lottery-platform}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123456}
+      TZ: ${CONTAINER_TZ:-Asia/Shanghai}
+      PGTZ: ${CONTAINER_TZ:-Asia/Shanghai}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - ../docker/data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-lottery-platform}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - lottery-net
+
+  redis:
+    image: redis:${REDIS_IMAGE_TAG:-7.4-alpine}
+    container_name: lottery-redis
+    restart: unless-stopped
+    command: [ "redis-server", "--appendonly", "yes" ]
+    ports:
+      - "${REDIS_HOST_PORT:-6379}:6379"
+    volumes:
+      - ../docker/data/redis:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - lottery-net
+
+  nacos:
+    image: nacos/nacos-server:${NACOS_IMAGE_TAG:-v3.1.1}
+    container_name: lottery-nacos
+    restart: unless-stopped
+    environment:
+      MODE: standalone
+      NACOS_AUTH_TOKEN: ${NACOS_AUTH_TOKEN:-YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY3ODkw}
+      NACOS_AUTH_IDENTITY_KEY: ${NACOS_AUTH_IDENTITY_KEY:-nacos1}
+      NACOS_AUTH_IDENTITY_VALUE: ${NACOS_AUTH_IDENTITY_VALUE:-nacos1}
+      TZ: ${CONTAINER_TZ:-Asia/Shanghai}
+    ports:
+      - "${NACOS_WEB_PORT:-8080}:8080"
+      - "${NACOS_SERVER_PORT:-8848}:8848"
+      - "${NACOS_RPC_PORT:-9848}:9848"
+    volumes:
+      - ../docker/data/nacos/logs:/home/nacos/logs
+      - ../docker/data/nacos/data:/home/nacos/data
+    networks:
+      - lottery-net
+
+  kafka:
+    image: apache/kafka:${KAFKA_IMAGE_TAG:-3.9.2}
+    container_name: lottery-kafka
+    restart: unless-stopped
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENERS: CONTROLLER://localhost:9091,HOST://0.0.0.0:9092,DOCKER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: HOST://${KAFKA_HOST:-localhost}:9092,DOCKER://lottery-kafka:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,DOCKER:PLAINTEXT,HOST:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9091
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_NUM_PARTITIONS: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      CLUSTER_ID: ${KAFKA_CLUSTER_ID:-MkU3OEVBNTcwNTJENDM2Qk}
+      TZ: ${CONTAINER_TZ:-Asia/Shanghai}
+    ports:
+      - "${KAFKA_HOST_PORT:-9092}:9092"
+    volumes:
+      - ../docker/data/kafka:/var/lib/kafka/data
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list > /dev/null 2>&1" ]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    networks:
+      - lottery-net
+
+  rocketmq-namesrv:
+    image: apache/rocketmq:${ROCKETMQ_IMAGE_TAG:-5.3.2}
+    container_name: lottery-rmq-namesrv
+    restart: unless-stopped
+    command: sh mqnamesrv
+    ports:
+      - "${ROCKETMQ_NAMESRV_PORT:-9876}:9876"
+    networks:
+      - lottery-net
+
+  rocketmq-broker:
+    image: apache/rocketmq:${ROCKETMQ_IMAGE_TAG:-5.3.2}
+    container_name: lottery-rmq-broker
+    restart: unless-stopped
+    depends_on:
+      - rocketmq-namesrv
+    environment:
+      NAMESRV_ADDR: rocketmq-namesrv:9876
+      TZ: ${CONTAINER_TZ:-Asia/Shanghai}
+    command: sh mqbroker --enable-proxy -c /home/rocketmq/rocketmq-5.3.2/conf/broker.conf
+    ports:
+      - "${ROCKETMQ_PROXY_PORT:-10909}:10909"
+      - "${ROCKETMQ_BROKER_PORT:-10911}:10911"
+      - "${ROCKETMQ_HA_PORT:-10912}:10912"
+    volumes:
+      - ../docker/conf/rocketmq/broker.conf:/home/rocketmq/rocketmq-5.3.2/conf/broker.conf
+      - ../docker/data/rocketmq/logs:/home/rocketmq/logs
+      - ../docker/data/rocketmq/store:/home/rocketmq/store
+    networks:
+      - lottery-net
+
+  minio:
+    image: quay.io/minio/minio:${MINIO_IMAGE_TAG:-RELEASE.2025-07-23T15-54-02Z}
+    container_name: lottery-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+      TZ: ${CONTAINER_TZ:-Asia/Shanghai}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - ../docker/data/minio:/data
+    networks:
+      - lottery-net
+
+networks:
+  lottery-net:
+    driver: bridge
