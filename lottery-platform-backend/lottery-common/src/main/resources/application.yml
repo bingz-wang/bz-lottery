@@ -1,9 +1,0 @@
-spring:
-  threads:
-    virtual:
-      enabled: true
-
-logging:
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level traceId=%X{traceId:-N/A} %logger{36} - %msg%n"
-

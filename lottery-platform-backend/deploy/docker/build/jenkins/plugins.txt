@@ -1,8 +1,0 @@
-configuration-as-code
-credentials-binding
-git
-junit
-matrix-auth
-pipeline-stage-view
-workflow-aggregator
-ws-cleanup
