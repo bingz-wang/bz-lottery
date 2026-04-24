@@ -23,5 +23,11 @@
 hs_err_pid*
 replay_pid*
 
-**/.idea/**
-**/.obsidian/**
+# IDE and Tooling
+.idea/
+.vscode/
+.obsidian/*
+*.swp
+*.swo
+.DS_Store
+

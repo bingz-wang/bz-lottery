@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "data/Data.md",
+                "file": "data/data-ddl.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Data"
+              "title": "data-ddl"
             }
           }
         ]
@@ -180,12 +180,35 @@
       "daily-notes:打开/创建今天的日记": false,
       "templates:插入模板": false,
       "command-palette:打开命令面板": false,
-      "bases:新建数据库": false
+      "bases:新建数据库": false,
+      "markdown-importer:打开 Markdown 格式转换器": false
     }
   },
   "active": "e0fe7fc21b47f27f",
   "lastOpenFiles": [
+    "data/data-baseline.md",
+    "data/data-ddl.md",
     "SKILL.md",
-    "data/Data.md"
+    "data/lottery-platform_1777048632888.md",
+    "未命名.base",
+    "data/lottery-platform数据库设计文档20260425001216.md",
+    "commit/git-commit-guidelines.md",
+    "commit",
+    "data",
+    "code/code-style.md",
+    "code",
+    "api/api-spec.md",
+    "api",
+    "business/business-rules.md",
+    "business",
+    "architecture/architecture-rules.md",
+    "architecture",
+    "architecture/架构规范.md",
+    "architecture/架构约束规范.md",
+    "api/API 接口规范.md",
+    "business/业务规则.md",
+    "code/编码规范.md",
+    "data/数据库基线文档.md",
+    "commit/Git 提交规范.md"
   ]
 }
