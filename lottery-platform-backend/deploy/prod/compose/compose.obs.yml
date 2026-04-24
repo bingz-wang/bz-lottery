@@ -1,0 +1,24 @@
+name: lottery-platform-prod-obs
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: lottery-prod-prometheus
+    restart: unless-stopped
+    volumes:
+      - ../data/prometheus:/prometheus
+    networks:
+      - lottery-prod-net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: lottery-prod-grafana
+    restart: unless-stopped
+    volumes:
+      - ../data/grafana:/var/lib/grafana
+    networks:
+      - lottery-prod-net
+
+networks:
+  lottery-prod-net:
+    driver: bridge
