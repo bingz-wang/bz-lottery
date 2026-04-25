@@ -44,8 +44,8 @@ const resultPrize = computed(() => {
 
     return {
         id: latestResult.value.prizeId ?? 'latest-result',
-        name: latestResult.value.prizeName ?? 'No Prize',
-        level: latestResult.value.prizeLevel ?? 'Miss',
+        name: latestResult.value.prizeName ?? '未中奖',
+        level: latestResult.value.prizeLevel ?? '未命中',
         probability: latestResult.value.hitProbability ?? '--',
         availableStock: '--',
         color: PRIZE_COLORS[0]
@@ -56,19 +56,33 @@ const displayMetrics = computed(() => analysisResult.value?.metrics ?? analysisM
 
 const analysisStageText = computed(() => {
     if (!analysisLoading.value) {
-        return analysisResult.value ? 'Completed' : 'Idle'
+        return analysisResult.value ? '分析完成' : '待分析'
     }
     if (analysisDraft.value.trim()) {
-        return 'Generating final narrative'
+        return '正在生成分析结论'
     }
     if (analysisReasoning.value.trim()) {
-        return 'Receiving reasoning stream'
+        return '正在接收推理过程'
     }
     if (analysisMetrics.value) {
-        return 'Metrics ready, waiting for model output'
+        return '指标已就绪，等待模型输出'
     }
-    return 'Opening analysis stream'
+    return '正在打开分析流'
 })
+
+function emptyText(value, fallback = '暂无') {
+    return value ?? fallback
+}
+
+function translateTrend(value) {
+    const map = {
+        up: '上升',
+        down: '下降',
+        flat: '平稳',
+        unknown: '未知'
+    }
+    return map[value] ?? value ?? '未知'
+}
 
 function normalizePrize(prize, index) {
     return {
@@ -86,8 +100,8 @@ function normalizeRecord(record) {
         recordNo: record.recordNo,
         drawStatus: record.drawStatus,
         prizeId: record.prizeId,
-        name: record.prizeName ?? 'No Prize',
-        level: record.prizeLevel ?? 'Miss',
+        name: record.prizeName ?? '未中奖',
+        level: record.prizeLevel ?? '未命中',
         remark: record.drawRemark ?? '',
         timeText: new Date(record.createdAt).toLocaleString('zh-CN', {hour12: false})
     }
@@ -97,8 +111,8 @@ function normalizeDrawResult(result) {
     return {
         recordNo: result.recordNo,
         prizeId: result.prizeId ?? null,
-        prizeName: result.prizeName ?? 'No Prize',
-        prizeLevel: result.prizeLevel ?? 'Miss',
+        prizeName: result.prizeName ?? '未中奖',
+        prizeLevel: result.prizeLevel ?? '未命中',
         drawStatus: result.drawStatus ?? 0,
         hitProbability: result.hitProbability ?? '--',
         drawRemark: result.drawRemark ?? ''
@@ -117,16 +131,16 @@ function normalizeAnalysisResult(result) {
             activeDays: result.metrics?.activeDays ?? 0,
             recent30DayDrawCount: result.metrics?.recent30DayDrawCount ?? 0,
             trendSummary: result.metrics?.trendSummary ?? 'flat',
-            highestPrizeLevel: result.metrics?.highestPrizeLevel ?? 'Unknown',
+            highestPrizeLevel: result.metrics?.highestPrizeLevel ?? '未知',
             highTierHitCount: result.metrics?.highTierHitCount ?? 0,
-            favoriteTimeBucket: result.metrics?.favoriteTimeBucket ?? 'Unknown',
-            mostFrequentPrizeName: result.metrics?.mostFrequentPrizeName ?? 'None',
+            favoriteTimeBucket: result.metrics?.favoriteTimeBucket ?? '未知',
+            mostFrequentPrizeName: result.metrics?.mostFrequentPrizeName ?? '暂无',
             mostFrequentPrizeCount: result.metrics?.mostFrequentPrizeCount ?? 0,
             pendingReviewCount: result.metrics?.pendingReviewCount ?? 0,
-            firstDrawAt: result.metrics?.firstDrawAt ?? 'Unknown',
-            latestDrawAt: result.metrics?.latestDrawAt ?? 'Unknown',
+            firstDrawAt: result.metrics?.firstDrawAt ?? '未知',
+            latestDrawAt: result.metrics?.latestDrawAt ?? '未知',
             prizeLevelDistribution: (result.metrics?.prizeLevelDistribution ?? []).map((item) => ({
-                prizeLevel: item.prizeLevel ?? 'Unclassified',
+                prizeLevel: item.prizeLevel ?? '未分类',
                 prizeLevelSort: item.prizeLevelSort ?? Number.MAX_SAFE_INTEGER,
                 count: item.count ?? 0
             }))
@@ -203,7 +217,7 @@ async function handleDraw() {
     } catch (error) {
         stopRolling()
         isDrawing.value = false
-        pageMessage.value = error.message || 'Draw failed. Please try again later.'
+        pageMessage.value = error.message || '抽奖失败，请稍后再试。'
     }
 }
 
@@ -254,16 +268,16 @@ async function handleAnalyze() {
                 if (analysisRequestToken !== requestToken) {
                     return
                 }
-                analysisError.value = message || 'AI analysis is temporarily unavailable.'
+                analysisError.value = message || 'AI 分析暂时不可用。'
             }
         })
 
         if (analysisRequestToken === requestToken && !analysisResult.value && !analysisError.value) {
-            analysisError.value = 'The analysis stream finished without a final result.'
+            analysisError.value = '分析流已结束，但没有返回最终结果。'
         }
     } catch (error) {
         if (analysisRequestToken === requestToken) {
-            analysisError.value = error.message || 'AI analysis is temporarily unavailable.'
+            analysisError.value = error.message || 'AI 分析暂时不可用。'
         }
     } finally {
         if (analysisRequestToken === requestToken) {
@@ -284,12 +298,12 @@ onBeforeUnmount(() => {
     <section class="panel wide-panel">
       <div class="section-header section-header-stack">
         <div>
-          <h3>Lottery Console</h3>
-          <p class="section-subtitle">Start a draw to play the rolling animation first, then reveal the final result in the modal.</p>
+          <h3>抽奖工作台</h3>
+          <p class="section-subtitle">点击抽奖后会先播放奖池滚动效果，再弹出本次抽奖结果。</p>
         </div>
         <div class="action-row">
           <button :disabled="isDrawing" class="primary-btn action-btn" @click="handleDraw">
-            {{ isDrawing ? 'Drawing...' : 'Start Draw' }}
+            {{ isDrawing ? '抽奖中...' : '立即抽奖' }}
           </button>
         </div>
       </div>
@@ -304,15 +318,15 @@ onBeforeUnmount(() => {
         >
           <span class="prize-level">{{ prize.level }}</span>
           <strong>{{ prize.name }}</strong>
-          <p class="prize-meta">Probability {{ prize.probability }} / Stock {{ prize.availableStock }}</p>
+          <p class="prize-meta">概率 {{ prize.probability }} / 库存 {{ prize.availableStock }}</p>
         </article>
       </div>
     </section>
 
     <section class="panel">
       <div class="section-header">
-        <h3>Recent Records</h3>
-        <span>{{ records.length }} items</span>
+        <h3>最近记录</h3>
+        <span>{{ records.length }} 条</span>
       </div>
       <div class="record-list compact-record-list">
         <article v-for="record in records" :key="record.recordNo" class="record-item">
@@ -331,13 +345,13 @@ onBeforeUnmount(() => {
     <transition name="result-pop">
       <div v-if="showResult && resultPrize" class="result-mask" @click.self="showResult = false">
         <div :style="{ '--accent': resultPrize.color }" class="result-dialog">
-          <p>{{ latestResult?.drawStatus === 2 ? 'Draw submitted, waiting for review' : 'You hit a prize' }}</p>
+          <p>{{ latestResult?.drawStatus === 2 ? '抽奖已提交，等待审核' : '本次抽奖结果' }}</p>
           <h3>{{ resultPrize.level }}</h3>
           <strong>{{ resultPrize.name }}</strong>
           <br/>
           <small class="result-remark">{{ latestResult?.drawRemark }}</small>
           <div class="result-actions">
-            <button class="primary-btn result-btn" @click="showResult = false">Close Result</button>
+            <button class="primary-btn result-btn" @click="showResult = false">我知道了</button>
           </div>
         </div>
       </div>
@@ -350,45 +364,45 @@ onBeforeUnmount(() => {
         @click="assistantOpen = !assistantOpen"
     >
       <span>AI</span>
-      <small>Helper</small>
+      <small>助手</small>
     </button>
 
     <transition name="assistant-pop">
       <aside v-if="assistantOpen" class="ai-panel">
         <div class="ai-panel-head">
           <div>
-            <p class="eyebrow">AI Assistant</p>
-            <h3>Lottery Analysis</h3>
+            <p class="eyebrow">AI 助手</p>
+            <h3>抽奖数据分析</h3>
           </div>
-          <button class="ai-panel-close" type="button" @click="assistantOpen = false">Close</button>
+          <button class="ai-panel-close" type="button" @click="assistantOpen = false">关闭</button>
         </div>
 
         <p class="ai-panel-copy">
-          The assistant first receives aggregated lottery metrics, then the model produces the final analysis and suggestions.
+          助手会先读取你的抽奖统计指标，再生成中文分析结论和后续建议。
         </p>
 
         <section class="ai-capability">
           <div>
-            <strong>Current Scope</strong>
-            <p>Activity trend, prize level performance, time-bucket preference, and pending-review status.</p>
+            <strong>当前分析范围</strong>
+            <p>抽奖活跃趋势、奖项等级表现、常用时间段和待审核状态。</p>
           </div>
           <button :disabled="analysisLoading" class="primary-btn ai-action-btn" @click="handleAnalyze">
-            {{ analysisLoading ? 'Analyzing...' : 'Analyze My Data' }}
+            {{ analysisLoading ? '分析中...' : '分析我的数据' }}
           </button>
         </section>
 
-        <label class="field-label" for="analysis-focus">Optional focus</label>
+        <label class="field-label" for="analysis-focus">关注点（可选）</label>
         <input
             id="analysis-focus"
             v-model="analysisFocus"
             class="user-input"
             maxlength="50"
-            placeholder="Example: are high-tier prizes improving recently?"
+            placeholder="例如：最近高等级奖项命中是否变好？"
             type="text"
         />
 
         <p class="ai-stream-status">
-          <span class="signed-badge">{{ analysisMeta?.model || 'lottery-ai' }}</span>
+          <span class="signed-badge">{{ analysisMeta?.model || '抽奖 AI' }}</span>
           <small>{{ analysisStageText }}</small>
         </p>
 
@@ -397,44 +411,44 @@ onBeforeUnmount(() => {
         <section v-if="displayMetrics || analysisLoading || analysisResult" class="ai-report">
           <div v-if="analysisResult" class="ai-report-meta">
             <span class="signed-badge">{{
-                analysisResult.status === 'AI_GENERATED' ? analysisResult.model : 'rule-based'
+                analysisResult.status === 'AI_GENERATED' ? analysisResult.model : '规则分析'
               }}</span>
             <small v-if="analysisResult.generatedAt">{{ analysisResult.generatedAt }}</small>
           </div>
 
           <div v-if="displayMetrics" class="ai-metrics-grid">
             <article class="ai-metric-card">
-              <span>Total draws</span>
+              <span>累计抽奖</span>
               <strong>{{ displayMetrics.totalDrawCount }}</strong>
             </article>
             <article class="ai-metric-card">
-              <span>Active days</span>
+              <span>活跃天数</span>
               <strong>{{ displayMetrics.activeDays }}</strong>
             </article>
             <article class="ai-metric-card">
-              <span>Last 30 days</span>
+              <span>近 30 天</span>
               <strong>{{ displayMetrics.recent30DayDrawCount }}</strong>
             </article>
             <article class="ai-metric-card">
-              <span>Highest level</span>
+              <span>最高奖级</span>
               <strong>{{ displayMetrics.highestPrizeLevel }}</strong>
             </article>
           </div>
 
           <div v-if="displayMetrics" class="ai-tag-row">
-            <span class="ai-tag">Trend: {{ displayMetrics.trendSummary }}</span>
-            <span class="ai-tag">High tier: {{ displayMetrics.highTierHitCount }}</span>
-            <span class="ai-tag">Time bucket: {{ displayMetrics.favoriteTimeBucket }}</span>
-            <span class="ai-tag">Pending review: {{ displayMetrics.pendingReviewCount }}</span>
+            <span class="ai-tag">趋势：{{ translateTrend(displayMetrics.trendSummary) }}</span>
+            <span class="ai-tag">高等级命中：{{ displayMetrics.highTierHitCount }}</span>
+            <span class="ai-tag">偏好时段：{{ emptyText(displayMetrics.favoriteTimeBucket) }}</span>
+            <span class="ai-tag">待审核：{{ displayMetrics.pendingReviewCount }}</span>
           </div>
 
           <div v-if="analysisReasoning" class="ai-section">
-            <h4>Reasoning Stream</h4>
+            <h4>推理过程</h4>
             <pre class="ai-stream-block">{{ analysisReasoning }}</pre>
           </div>
 
           <div v-if="analysisDraft && !analysisResult" class="ai-section">
-            <h4>Draft Output</h4>
+            <h4>生成草稿</h4>
             <pre class="ai-stream-block">{{ analysisDraft }}</pre>
           </div>
 
@@ -442,21 +456,21 @@ onBeforeUnmount(() => {
             <p class="ai-overview">{{ analysisResult.overview }}</p>
 
             <div class="ai-section">
-              <h4>Insights</h4>
+              <h4>关键洞察</h4>
               <ul class="ai-list">
                 <li v-for="item in analysisResult.insights" :key="item">{{ item }}</li>
               </ul>
             </div>
 
             <div class="ai-section">
-              <h4>Suggestions</h4>
+              <h4>优化建议</h4>
               <ul class="ai-list">
                 <li v-for="item in analysisResult.suggestions" :key="item">{{ item }}</li>
               </ul>
             </div>
 
             <div class="ai-section">
-              <h4>Prize Level Distribution</h4>
+              <h4>奖项等级分布</h4>
               <div class="ai-level-list">
                 <article
                     v-for="item in analysisResult.metrics.prizeLevelDistribution"
@@ -464,7 +478,7 @@ onBeforeUnmount(() => {
                     class="ai-level-item"
                 >
                   <span>{{ item.prizeLevel }}</span>
-                  <strong>{{ item.count }} hits</strong>
+                  <strong>{{ item.count }} 次</strong>
                 </article>
               </div>
             </div>

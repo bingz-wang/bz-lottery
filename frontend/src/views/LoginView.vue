@@ -52,15 +52,15 @@ async function submit() {
 <template>
   <div class="auth-scene">
     <section class="auth-hero">
-      <p class="eyebrow">Lottery Platform Access</p>
-      <h1>Lottery Platform</h1>
+      <p class="eyebrow">抽奖平台入口</p>
+      <h1>幸运抽奖台</h1>
       <p class="hero-copy">
-        这套页面已经接入网关鉴权、登录跳转、RBAC 菜单生成和动态路由注册。未登录用户只能停留在这里，登录后才会进入业务区。
+        登录后进入抽奖、奖池和账号中心。系统会根据你的角色自动生成可访问菜单，未登录用户会被留在当前入口页。
       </p>
       <div class="hero-badges">
-        <span>Spring Security</span>
-        <span>Sa-Token</span>
-        <span>Keycloak Ready</span>
+        <span>统一网关鉴权</span>
+        <span>角色菜单</span>
+        <span>动态路由</span>
       </div>
     </section>
 

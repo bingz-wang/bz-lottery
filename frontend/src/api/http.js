@@ -61,7 +61,7 @@ export async function requestJson(url, options = {}) {
     }
 
     if (!response.ok || !payload || payload.code !== '00000') {
-        throw new Error(payload?.message ?? `Request failed: ${response.status}`)
+        throw new Error(payload?.message ?? `请求失败：${response.status}`)
     }
 
     return payload.data
@@ -82,11 +82,11 @@ export async function requestEventStream(url, options = {}, handlers = {}) {
 
     if (!response.ok) {
         const message = await response.text().catch(() => '')
-        throw new Error(message || `Request failed: ${response.status}`)
+        throw new Error(message || `请求失败：${response.status}`)
     }
 
     if (!response.body) {
-        throw new Error('Streaming is not supported in the current browser')
+        throw new Error('当前浏览器不支持流式响应')
     }
 
     const reader = response.body.getReader()
@@ -157,7 +157,7 @@ function handleSseChunk(chunk, handlers) {
     })
 
     if (eventName === 'error') {
-        const message = payload?.data ?? payload?.message ?? 'Streaming analysis failed'
+        const message = payload?.data ?? payload?.message ?? '流式分析失败'
         handlers.onError?.(message, payload)
         return
     }

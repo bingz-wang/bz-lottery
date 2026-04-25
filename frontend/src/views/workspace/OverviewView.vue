@@ -9,7 +9,7 @@ const availableRoutes = computed(() => routeCatalog.filter((item) => hasRole(ite
 <template>
   <div class="workspace-grid two-columns">
     <section class="panel poster-panel">
-      <p class="eyebrow">Role Driven Access</p>
+      <p class="eyebrow">角色驱动访问</p>
       <h2>欢迎回来，{{ sessionState.profile?.nickname }}</h2>
       <p class="hero-copy">
         你的菜单、页面与可访问功能是根据当前角色实时生成的。普通用户默认拥有抽奖与个人中心，管理员会额外看到运营台。

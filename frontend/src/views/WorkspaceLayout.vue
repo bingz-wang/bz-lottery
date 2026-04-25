@@ -43,12 +43,12 @@ async function logout() {
       <div>
         <div class="sidebar-head">
           <div>
-            <p class="eyebrow">RBAC Console</p>
+            <p class="eyebrow">权限控制台</p>
             <h2>抽奖控制台</h2>
           </div>
           <button class="sidebar-close-btn" type="button" @click="mobileNavOpen = false">关闭</button>
         </div>
-        <p class="sidebar-copy">导航会根据当前登录用户的角色动态注册与展示。</p>
+        <p class="sidebar-copy">导航会根据当前登录用户的角色和菜单权限实时展示。</p>
       </div>
 
       <nav class="workspace-nav">
@@ -68,7 +68,7 @@ async function logout() {
         <span class="signed-label">当前登录</span>
         <strong>{{ sessionState.profile?.nickname }}</strong>
         <p>{{ sessionState.profile?.username }}</p>
-        <p>{{ sessionState.roles.join(' · ') }}</p>
+        <p>{{ sessionState.roles.join(' / ') }}</p>
         <button class="ghost-btn full-width" @click="logout">退出登录</button>
       </div>
     </aside>
@@ -76,7 +76,7 @@ async function logout() {
     <section class="workspace-main">
       <header class="workspace-header">
         <div>
-          <p class="eyebrow">Protected Workspace</p>
+          <p class="eyebrow">受保护工作区</p>
           <h1>{{ route.meta.title || '工作台' }}</h1>
         </div>
       </header>

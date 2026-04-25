@@ -1,5 +1,5 @@
 :root {
-    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans CJK SC', 'Segoe UI', sans-serif;
     color: #f7f1e8;
     background: radial-gradient(circle at top left, rgba(255, 140, 66, 0.24), transparent 28%),
     radial-gradient(circle at right center, rgba(36, 92, 142, 0.18), transparent 24%),
@@ -44,8 +44,8 @@ button {
     margin: 0 0 1rem;
     color: #ffd166;
     font-size: 0.86rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .hero-copy,

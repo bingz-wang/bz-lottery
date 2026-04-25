@@ -175,18 +175,18 @@ public class LotteryAnalysisService {
         String highestPrizeLevel = records.stream()
                 .filter(record -> record.getPrizeLevelSort() != null)
                 .min(Comparator.comparing(DrawRecord::getPrizeLevelSort))
-                .map(record -> defaultText(record.getPrizeLevel(), "Unknown"))
-                .orElse("Unknown");
+                .map(record -> defaultText(record.getPrizeLevel(), "未知"))
+                .orElse("未知");
 
         Map<String, Long> prizeCountMap = records.stream()
                 .collect(Collectors.groupingBy(
-                        record -> defaultText(record.getPrizeName(), "Unknown prize"),
+                        record -> defaultText(record.getPrizeName(), "未知奖品"),
                         LinkedHashMap::new,
                         Collectors.counting()
                 ));
         Map.Entry<String, Long> mostFrequentPrize = prizeCountMap.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
-                .orElse(Map.entry("None", 0L));
+                .orElse(Map.entry("无", 0L));
 
         String favoriteTimeBucket = records.stream()
                 .collect(Collectors.groupingBy(
@@ -198,11 +198,11 @@ public class LotteryAnalysisService {
                 .stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
-                .orElse("Balanced");
+                .orElse("分布均衡");
 
         List<LotteryUserAnalysisMetrics.PrizeLevelMetric> prizeLevelDistribution = records.stream()
                 .collect(Collectors.groupingBy(
-                        record -> defaultText(record.getPrizeLevel(), "Unknown"),
+                        record -> defaultText(record.getPrizeLevel(), "未知"),
                         Collectors.collectingAndThen(Collectors.toList(), items -> new LotteryUserAnalysisMetrics.PrizeLevelMetric(
                                 items.get(0).getPrizeLevel(),
                                 items.get(0).getPrizeLevelSort(),
@@ -261,10 +261,10 @@ public class LotteryAnalysisService {
 
     private String buildFallbackOverview(LotteryUserAnalysisMetrics metrics, String focus) {
         String focusText = (focus == null || focus.isBlank())
-                ? "The summary covers activity, prize level, and recent trend."
-                : "This summary focuses on: " + focus.trim() + ".";
+                ? "本次摘要覆盖参与活跃度、奖项层级和近期趋势。"
+                : "本次摘要重点关注：" + focus.trim() + "。";
         return """
-                The user has %d total draws across %d active days, including %d draws in the last 30 days. The highest prize level reached is %s, high-tier hits total %d, and the most frequent draw period is %s. %s
+                该用户累计抽奖 %d 次，覆盖 %d 个活跃日，近 30 天参与 %d 次。当前最高命中奖项层级为 %s，高等级命中累计 %d 次，最常参与时段为 %s。%s
                 """.formatted(
                 metrics.totalDrawCount(),
                 metrics.activeDays(),
@@ -278,15 +278,15 @@ public class LotteryAnalysisService {
 
     private List<String> buildFallbackInsights(LotteryUserAnalysisMetrics metrics) {
         return List.of(
-                "The 30-day trend is %s, which suggests the recent participation level is %s.".formatted(
+                "近 30 天趋势为 %s，说明近期参与度%s。".formatted(
                         metrics.trendSummary(),
-                        metrics.recent30DayDrawCount() >= metrics.previous30DayDrawCount() ? "stable or increasing" : "cooling down"
+                        metrics.recent30DayDrawCount() >= metrics.previous30DayDrawCount() ? "保持稳定或有所提升" : "有所回落"
                 ),
-                "The highest achieved prize level is %s, and high-tier hits total %d.".formatted(
+                "当前最高命中奖项层级为 %s，高等级命中累计 %d 次。".formatted(
                         metrics.highestPrizeLevel(),
                         metrics.highTierHitCount()
                 ),
-                "The most frequent prize is %s with %d occurrences, and draws are more concentrated in %s.".formatted(
+                "命中频次最高的奖品是 %s，共出现 %d 次，抽奖时间更集中在 %s。".formatted(
                         metrics.mostFrequentPrizeName(),
                         metrics.mostFrequentPrizeCount(),
                         metrics.favoriteTimeBucket()
@@ -296,13 +296,13 @@ public class LotteryAnalysisService {
 
     private List<String> buildFallbackSuggestions(LotteryUserAnalysisMetrics metrics, String focus) {
         String focusSuggestion = (focus == null || focus.isBlank())
-                ? "If you need a deeper report, add campaign-period comparison or guarantee-trigger analysis next."
-                : "The current focus is \"%s\". A window-based trend comparison would be a good next step.".formatted(focus.trim());
+                ? "如需更深入报告，建议补充活动周期对比或保底触发分析。"
+                : "当前关注点是“%s”，建议继续做分窗口趋势对比。".formatted(focus.trim());
         return List.of(
-                "Break the recent 30-day activity into weekly slices to see whether participation is event-driven.",
+                "将近 30 天参与行为拆分为周维度，判断参与变化是否由活动节点驱动。",
                 metrics.pendingReviewCount() > 0
-                        ? "There are %d records pending review. Include review outcomes in analysis to avoid lagged high-tier statistics.".formatted(metrics.pendingReviewCount())
-                        : "Overlay prize stock and campaign batches to understand whether strategy changes affected results.",
+                        ? "当前有 %d 条记录待审核，建议纳入审核结果，避免高等级奖项统计滞后。".formatted(metrics.pendingReviewCount())
+                        : "叠加奖品库存和活动批次，判断策略调整是否影响命中结果。",
                 focusSuggestion
         );
     }
@@ -335,34 +335,34 @@ public class LotteryAnalysisService {
 
     private String resolveTimeBucket(LocalDateTime time) {
         if (time == null) {
-            return "Unknown";
+            return "未知";
         }
 
         int hour = time.getHour();
         if (hour < 6) {
-            return "Late night";
+            return "深夜";
         }
         if (hour < 12) {
-            return "Morning";
+            return "上午";
         }
         if (hour < 18) {
-            return "Afternoon";
+            return "下午";
         }
-        return "Evening";
+        return "晚上";
     }
 
     private String buildTrendSummary(long recent30DayDrawCount, long previous30DayDrawCount) {
         if (recent30DayDrawCount > previous30DayDrawCount) {
-            return "up";
+            return "上升";
         }
         if (recent30DayDrawCount < previous30DayDrawCount) {
-            return "down";
+            return "下降";
         }
-        return "flat";
+        return "持平";
     }
 
     private String formatDateTime(LocalDateTime time) {
-        return time == null ? "Unknown" : time.format(DATE_TIME_FORMATTER);
+        return time == null ? "未知" : time.format(DATE_TIME_FORMATTER);
     }
 
     private String defaultText(String value, String fallback) {

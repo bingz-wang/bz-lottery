@@ -14,6 +14,7 @@ public class GlmProperties {
     private String model = "glm-5.1";
     private Float temperature = 0.6f;
     private Integer maxTokens = 1024;
+    private String systemPromptLocation = "classpath:prompt/SYSTEM_PROMPT.md";
     private Duration connectTimeout = Duration.ofSeconds(5);
     private Duration readTimeout = Duration.ofSeconds(60);
 
@@ -55,6 +56,14 @@ public class GlmProperties {
 
     public void setMaxTokens(Integer maxTokens) {
         this.maxTokens = maxTokens;
+    }
+
+    public String getSystemPromptLocation() {
+        return systemPromptLocation;
+    }
+
+    public void setSystemPromptLocation(String systemPromptLocation) {
+        this.systemPromptLocation = systemPromptLocation;
     }
 
     public Duration getConnectTimeout() {

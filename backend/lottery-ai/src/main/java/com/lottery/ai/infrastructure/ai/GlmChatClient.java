@@ -29,33 +29,14 @@ public class GlmChatClient {
 
     private static final Logger log = LoggerFactory.getLogger(GlmChatClient.class);
 
-    private static final String SYSTEM_PROMPT = String.join("\n",
-            "You are a strict JSON generator for lottery analysis.",
-            "Return one JSON object only.",
-            "Do not output markdown, explanations, bullet points, code fences, or any extra wrapper text.",
-            "Use Chinese text for all field values.",
-            "",
-            "Required schema:",
-            "{",
-            "  \"overview\": \"80-140 Chinese characters summary\",",
-            "  \"insights\": [\"insight 1\", \"insight 2\", \"insight 3\"],",
-            "  \"suggestions\": [\"suggestion 1\", \"suggestion 2\", \"suggestion 3\"]",
-            "}",
-            "",
-            "Rules:",
-            "1. Base the analysis only on the provided metrics and focus.",
-            "2. Do not fabricate facts.",
-            "3. Prioritize focus when it is not empty.",
-            "4. Keep the wording professional and concise.",
-            "5. Fill the fields with final content instead of repeating the schema example."
-    );
-
     private final ObjectMapper objectMapper;
     private final GlmProperties glmProperties;
+    private final SystemPromptProvider systemPromptProvider;
 
-    public GlmChatClient(ObjectMapper objectMapper, GlmProperties glmProperties) {
+    public GlmChatClient(ObjectMapper objectMapper, GlmProperties glmProperties, SystemPromptProvider systemPromptProvider) {
         this.objectMapper = objectMapper;
         this.glmProperties = glmProperties;
+        this.systemPromptProvider = systemPromptProvider;
     }
 
     public boolean isEnabled() {
@@ -84,7 +65,7 @@ public class GlmChatClient {
                     .messages(List.of(
                             ChatMessage.builder()
                                     .role(ChatMessageRole.SYSTEM.value())
-                                    .content(SYSTEM_PROMPT)
+                                    .content(systemPromptProvider.loadSystemPrompt())
                                     .build(),
                             ChatMessage.builder()
                                     .role(ChatMessageRole.USER.value())
@@ -127,7 +108,7 @@ public class GlmChatClient {
                     .messages(List.of(
                             ChatMessage.builder()
                                     .role(ChatMessageRole.SYSTEM.value())
-                                    .content(SYSTEM_PROMPT)
+                                    .content(systemPromptProvider.loadSystemPrompt())
                                     .build(),
                             ChatMessage.builder()
                                     .role(ChatMessageRole.USER.value())
@@ -204,8 +185,8 @@ public class GlmChatClient {
 
         try {
             return String.format(
-                    "Please analyze the following lottery metrics and return the final result in Chinese JSON only.%n"
-                            + "If focus is not empty, prioritize the focus in the analysis.%n%n"
+                    "请分析以下抽奖指标，并只返回中文 JSON 结果。%n"
+                            + "如果 focus 不为空，请优先围绕该关注点分析。%n%n"
                             + "focus: %s%n"
                             + "metrics:%n%s",
                     focus == null ? "" : focus,
@@ -324,8 +305,8 @@ public class GlmChatClient {
         List<String> suggestions = readOptionalStringList(node, "suggestions");
 
         boolean hasPlaceholderOverview = overview.isBlank() || "80-140字中文摘要".equals(overview.trim());
-        boolean hasPlaceholderInsights = insights.stream().anyMatch(item -> item != null && item.matches("字符串\\d+"));
-        boolean hasPlaceholderSuggestions = suggestions.stream().anyMatch(item -> item != null && item.matches("字符串\\d+"));
+        boolean hasPlaceholderInsights = insights.stream().anyMatch(item -> item != null && item.matches("洞察\\s*\\d+"));
+        boolean hasPlaceholderSuggestions = suggestions.stream().anyMatch(item -> item != null && item.matches("建议\\s*\\d+"));
 
         if (hasPlaceholderOverview || hasPlaceholderInsights || hasPlaceholderSuggestions) {
             throw new BusinessException("GLM response still contains schema placeholders");

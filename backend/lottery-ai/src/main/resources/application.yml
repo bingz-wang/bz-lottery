@@ -61,5 +61,7 @@ ai:
     model: ${GLM_MODEL:glm-5.1}
     temperature: ${GLM_TEMPERATURE:0.6}
     max-tokens: ${GLM_MAX_TOKENS:1024}
+    # 可切换为 classpath:prompt/OTHER_PROMPT.md 或 file:D:/config/lottery-ai/prompt.md
+    system-prompt-location: ${AI_SYSTEM_PROMPT_LOCATION:classpath:prompt/SYSTEM_PROMPT.md}
     connect-timeout: ${GLM_CONNECT_TIMEOUT:PT5S}
     read-timeout: ${GLM_READ_TIMEOUT:PT60S}
