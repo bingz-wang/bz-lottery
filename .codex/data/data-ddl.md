@@ -1,18 +1,18 @@
 
 ### 1.flyway_schema_history(无注释)
 
-|列名|数据类型|是否为空|默认值|主键|备注|
-|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-|installed_rank| int4| false| | true| |
-|version| varchar(50)| true| | false| |
-|description| varchar(200)| false| | false| |
-|type| varchar(20)| false| | false| |
-|script| varchar(1000)| false| | false| |
-|checksum| int4| true| | false| |
-|installed_by| varchar(100)| false| | false| |
-|installed_on| timestamp| false| now()| false| |
-|execution_time| int4| false| | false| |
-|success| bool| false| | false| |
+|       列名       |     数据类型      | 是否为空  |  默认值  |  主键   | 备注  |
+| :------------: | :-----------: | :---: | :---: | :---: | :-: |
+| installed_rank |     int4      | false |       | true  |     |
+|    version     |  varchar(50)  | true  |       | false |     |
+|  description   | varchar(200)  | false |       | false |     |
+|      type      |  varchar(20)  | false |       | false |     |
+|     script     | varchar(1000) | false |       | false |     |
+|    checksum    |     int4      | true  |       | false |     |
+|  installed_by  | varchar(100)  | false |       | false |     |
+|  installed_on  |   timestamp   | false | now() | false |     |
+| execution_time |     int4      | false |       | false |     |
+|    success     |     bool      | false |       | false |     |
 
 #### 索引信息
 
