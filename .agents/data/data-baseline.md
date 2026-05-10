@@ -1,3 +1,9 @@
+---
+category: data
+version: "1.0.0"
+last_updated: "2026-05-09"
+---
+
 # 数据基线
 
 ## 摘要

@@ -1,3 +1,9 @@
+---
+category: architecture
+version: "1.0.0"
+last_updated: "2026-05-09"
+---
+
 # 架构规范
 
 ## 摘要

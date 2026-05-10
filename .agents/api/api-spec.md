@@ -1,3 +1,9 @@
+---
+category: api
+version: "1.0.0"
+last_updated: "2026-05-09"
+---
+
 # API 规范
 
 ## 摘要

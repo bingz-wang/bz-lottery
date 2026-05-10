@@ -1,3 +1,9 @@
+---
+category: commit
+version: "1.0.0"
+last_updated: "2026-05-09"
+---
+
 # 提交规范
 
 ## 摘要
