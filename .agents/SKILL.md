@@ -19,7 +19,7 @@ license: internal
    - `business` 目录：[business-rules]
    - `api` 目录：[api-spec]
    - `code` 目录：[coding-standards]、[java-dev]
-   - `data` 目录：[data-baseline]、[schema-index]、`ddl/*.sql`
+   - `data` 目录：[data-baseline]、[schema-index]、[ddl-all-tables]
    - `commit` 目录：[git-commit-guidelines]
 3. 若目录下存在多个 reference 文件，按文件名升序读取。
 4. 先读后改，先评估影响范围再修改代码。
@@ -46,7 +46,7 @@ license: internal
 2) business: [business-rules]
 3) api: [api-spec]
 4) code: [coding-standards], [java-dev]
-5) data: [data-baseline], [schema-index], ddl/*.sql
+5) data: [data-baseline], [schema-index], [ddl-all-tables]
 6) commit: [git-commit-guidelines]
 然后再开始实现。
 ```
@@ -62,4 +62,5 @@ license: internal
 | [java-dev] | `.agents/code/java-dev.md` |
 | [data-baseline] | `.agents/data/data-baseline.md` |
 | [schema-index] | `.agents/data/schema-index.md` |
+| [ddl-all-tables] | `.agents/data/ddl-all-tables.md` |
 | [git-commit-guidelines] | `.agents/commit/git-commit-guidelines.md` |

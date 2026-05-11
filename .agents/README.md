@@ -21,16 +21,8 @@
 │   └── java-dev.md                    # Java 开发规范：Lombok、并发、N+1、校验、SQL 等
 ├── data/
 │   ├── data-baseline.md               # 数据基线：Flyway 迁移、约束、幂等规则
+│   ├── ddl-all-tables.md              # 全量表结构 DDL：所有建表语句（可直接执行）
 │   ├── schema-index.md                # 表结构索引：所有表的用途、关系、索引概览
-│   └── ddl/
-│       ├── lottery_draw_record.sql    # 抽奖记录表 DDL
-│       ├── lottery_prize.sql          # 奖品表 DDL
-│       ├── lottery_system_config.sql  # 系统配置表 DDL
-│       ├── role_menu_rel.sql          # 角色-菜单关联表 DDL
-│       ├── sys_menu.sql               # 系统菜单表 DDL
-│       ├── sys_role.sql               # 系统角色表 DDL
-│       ├── user_account.sql           # 用户账户表 DDL
-│       └── user_role_rel.sql          # 用户-角色关联表 DDL
 └── commit/
     └── git-commit-guidelines.md       # 提交规范：分支、信息格式、PR 要求
 ```
@@ -47,13 +39,13 @@
 | 编码 | `code/java-dev.md` | Lombok、并发安全、N+1、输入校验、SQL 规范 |
 | 数据 | `data/data-baseline.md` | Flyway 迁移策略、幂等、约束 |
 | 数据 | `data/schema-index.md` | 表结构索引与关系说明 |
-| 数据 | `data/ddl/*.sql` | 每表独立 DDL，可直接执行 |
+| 数据 | `data/ddl-all-tables.md` | 全量表结构 DDL，所有建表语句合并，可直接执行 |
 | 提交 | `commit/git-commit-guidelines.md` | 分支命名、提交信息、PR 模板 |
 
 ## 维护规范
 
 1. **新增规范文档**：在对应领域目录下新建 `.md` 文件，使用统一的 YAML frontmatter 模板，同步更新 `SKILL.md` 的 Reference 章节和本 README。
-2. **新增 DDL**：在 `data/ddl/` 下新建 `{table_name}.sql`，同步更新 `data/schema-index.md`。
+2. **新增 DDL**：在 `data/ddl-all-tables.md` 中追加新的建表章节，同步更新 `data/schema-index.md`。
 3. **修改现有规范**：先评估影响范围，更新 `last_updated` 字段，必要时在文档内标注变更记录。
 4. **编码**：所有文档使用 UTF-8 无 BOM 编码，换行符 LF。
 
