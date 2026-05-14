@@ -13,14 +13,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Component
-public class SystemPromptProvider {
+public class PromptProvider {
 
     private static final String DEFAULT_PROMPT_LOCATION = "classpath:prompt/SYSTEM_PROMPT.md";
 
     private final GlmProperties glmProperties;
     private final ResourceLoader resourceLoader;
 
-    public SystemPromptProvider(GlmProperties glmProperties, ResourceLoader resourceLoader) {
+    public PromptProvider(GlmProperties glmProperties, ResourceLoader resourceLoader) {
         this.glmProperties = glmProperties;
         this.resourceLoader = resourceLoader;
     }
@@ -66,3 +66,4 @@ public class SystemPromptProvider {
         }
     }
 }
+

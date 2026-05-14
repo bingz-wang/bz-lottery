@@ -31,12 +31,12 @@ public class GlmChatClient {
 
     private final ObjectMapper objectMapper;
     private final GlmProperties glmProperties;
-    private final SystemPromptProvider systemPromptProvider;
+    private final PromptProvider promptProvider;
 
-    public GlmChatClient(ObjectMapper objectMapper, GlmProperties glmProperties, SystemPromptProvider systemPromptProvider) {
+    public GlmChatClient(ObjectMapper objectMapper, GlmProperties glmProperties, PromptProvider promptProvider) {
         this.objectMapper = objectMapper;
         this.glmProperties = glmProperties;
-        this.systemPromptProvider = systemPromptProvider;
+        this.promptProvider = promptProvider;
     }
 
     public boolean isEnabled() {
@@ -65,7 +65,7 @@ public class GlmChatClient {
                     .messages(List.of(
                             ChatMessage.builder()
                                     .role(ChatMessageRole.SYSTEM.value())
-                                    .content(systemPromptProvider.loadSystemPrompt())
+                                    .content(promptProvider.loadSystemPrompt())
                                     .build(),
                             ChatMessage.builder()
                                     .role(ChatMessageRole.USER.value())
@@ -108,7 +108,7 @@ public class GlmChatClient {
                     .messages(List.of(
                             ChatMessage.builder()
                                     .role(ChatMessageRole.SYSTEM.value())
-                                    .content(systemPromptProvider.loadSystemPrompt())
+                                    .content(promptProvider.loadSystemPrompt())
                                     .build(),
                             ChatMessage.builder()
                                     .role(ChatMessageRole.USER.value())
